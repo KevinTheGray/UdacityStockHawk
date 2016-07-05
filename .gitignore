@@ -1,0 +1,22 @@
+# mac os x
+.DS_Store
+
+# local settings
+/local.properties
+
+# gradle / build
+.gradle
+/build
+/captures
+/dist
+
+# Android studio
+/.idea/workspace.xml
+/.idea/tasks.xml
+/.idea/modules.xml
+/.idea/libraries
+/.idea/inspectionProfiles
+/.idea/misc.xml
+/.idea/vcs.xml
+/.idea/.name
+/**/*.iml
