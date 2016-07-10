@@ -107,8 +107,9 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                       new String[] { QuoteColumns.SYMBOL }, QuoteColumns.SYMBOL + "= ?",
                       new String[] { input.toString().toLowerCase() }, null);
                   if (c.getCount() != 0) {
+                    String message = getString(R.string.stock_already_added);
                     Toast toast =
-                        Toast.makeText(MyStocksActivity.this, "This stock is already saved!",
+                        Toast.makeText(MyStocksActivity.this, message,
                             Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.CENTER, Gravity.CENTER, 0);
                     toast.show();

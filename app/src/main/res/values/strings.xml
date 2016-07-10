@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/tools">
   <string name="app_name" translatable="true">Stock Hawk</string>
 
   <string name="action_settings" translatable="true">Settings</string>
@@ -11,4 +11,8 @@
 
   <!-- Content descriptions -->
   <string name="content_description_add_stock" translatable="true">Add Stock</string>
+
+  <!-- User messages -->
+  <string name="invalid_stock_symbol" translatable="true"><xliff:g id="symbol">%1$s</xliff:g> is not a valid stock symbol!</string>
+  <string name="stock_already_added" translatable="true">This stock is already saved!</string>
 </resources>

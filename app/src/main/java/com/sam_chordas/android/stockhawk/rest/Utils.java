@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
 
+import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
 import com.sam_chordas.android.stockhawk.service.StockIntentService;
@@ -85,7 +86,7 @@ public class Utils {
     return change;
   }
 
-  public static ContentProviderOperation buildBatchOperation(Context context, JSONObject jsonObject){
+  public static ContentProviderOperation buildBatchOperation(final Context context, JSONObject jsonObject){
     ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
         QuoteProvider.Quotes.CONTENT_URI);
     try {
@@ -117,11 +118,10 @@ public class Utils {
           Runnable runnable = new Runnable() {
             @Override
             public void run() {
-              String message = "";
-              if (symbol != null) {
-                message += symbol + " ";
-              }
-              message += "is not a valid stock symbol!";
+              int messageId = R.string.invalid_stock_symbol;
+              String message = String.format(context.getString(
+                messageId,
+                symbol));
               Toast toast =
                 Toast.makeText(stockIntentService.getApplicationContext(), message,
                   Toast.LENGTH_SHORT);
