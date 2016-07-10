@@ -1,10 +1,16 @@
 package com.sam_chordas.android.stockhawk.rest;
 
 import android.content.ContentProviderOperation;
+import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.view.Gravity;
+import android.widget.Toast;
 
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
+import com.sam_chordas.android.stockhawk.service.StockIntentService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,7 +27,7 @@ public class Utils {
 
   public static boolean showPercent = true;
 
-  public static ArrayList quoteJsonToContentVals(String JSON){
+  public static ArrayList quoteJsonToContentVals(Context context,  String JSON){
     ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
     JSONObject jsonObject = null;
     JSONArray resultsArray = null;
@@ -33,7 +39,7 @@ public class Utils {
         if (count == 1){
           jsonObject = jsonObject.getJSONObject("results")
               .getJSONObject("quote");
-          ContentProviderOperation operation = buildBatchOperation(jsonObject);
+          ContentProviderOperation operation = buildBatchOperation(context, jsonObject);
           if (operation != null) {
             batchOperations.add(operation);
           }
@@ -43,7 +49,7 @@ public class Utils {
           if (resultsArray != null && resultsArray.length() != 0){
             for (int i = 0; i < resultsArray.length(); i++){
               jsonObject = resultsArray.getJSONObject(i);
-              ContentProviderOperation operation = buildBatchOperation(jsonObject);
+              ContentProviderOperation operation = buildBatchOperation(context, jsonObject);
               if (operation != null) {
                 batchOperations.add(operation);
               }
@@ -79,16 +85,17 @@ public class Utils {
     return change;
   }
 
-  public static ContentProviderOperation buildBatchOperation(JSONObject jsonObject){
+  public static ContentProviderOperation buildBatchOperation(Context context, JSONObject jsonObject){
     ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
         QuoteProvider.Quotes.CONTENT_URI);
     try {
       String change = jsonObject.getString("Change");
-      String symbol = jsonObject.getString("symbol").toLowerCase();
+      final String symbol = jsonObject.getString("symbol").toLowerCase();
       String bidPrice = jsonObject.getString("Bid");
       String changeInPercent = jsonObject.getString("ChangeinPercent");
 
-      if (!change.equals("null") && !bidPrice.equals("null") && !changeInPercent.equals("null")) {
+      if (change != null && !change.equals("null") && bidPrice != null && !bidPrice.equals("null")
+        && changeInPercent != null && !changeInPercent.equals("null") && symbol != null) {
         builder.withValue(QuoteColumns.SYMBOL, symbol);
         builder.withValue(QuoteColumns.BIDPRICE, truncateBidPrice(bidPrice));
         builder.withValue(QuoteColumns.PERCENT_CHANGE, truncateChange(
@@ -102,6 +109,28 @@ public class Utils {
         }
         return builder.build();
       } else {
+
+        if (context instanceof StockIntentService) {
+          final StockIntentService stockIntentService = (StockIntentService) context;
+          // Make sure it runs on UI thread
+          Handler handler = new Handler(Looper.getMainLooper());
+          Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+              String message = "";
+              if (symbol != null) {
+                message += symbol + " ";
+              }
+              message += "is not a valid stock symbol!";
+              Toast toast =
+                Toast.makeText(stockIntentService.getApplicationContext(), message,
+                  Toast.LENGTH_SHORT);
+              toast.setGravity(Gravity.CENTER, Gravity.CENTER, 0);
+              toast.show();
+            }
+          };
+          handler.post(runnable);
+        }
         return null;
       }
     } catch (JSONException e) {
