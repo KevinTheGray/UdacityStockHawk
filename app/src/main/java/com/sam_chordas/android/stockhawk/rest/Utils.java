@@ -27,6 +27,7 @@ public class Utils {
   private static String LOG_TAG = Utils.class.getSimpleName();
 
   public static boolean showPercent = true;
+  public static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
 
   public static ArrayList quoteJsonToContentVals(Context context,  String JSON){
     ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
@@ -65,8 +66,12 @@ public class Utils {
   }
 
   public static String truncateBidPrice(String bidPrice){
-    bidPrice = String.format("%.2f", Float.parseFloat(bidPrice));
-    return bidPrice;
+    if (bidPrice == null) {
+      return "0.00";
+    } else {
+      bidPrice = String.format("%.2f", Float.parseFloat(bidPrice));
+      return bidPrice;
+    }
   }
 
   public static String truncateChange(String change, boolean isPercentChange){
@@ -95,10 +100,16 @@ public class Utils {
       String bidPrice = jsonObject.getString("Bid");
       String changeInPercent = jsonObject.getString("ChangeinPercent");
 
-      if (change != null && !change.equals("null") && bidPrice != null && !bidPrice.equals("null")
-        && changeInPercent != null && !changeInPercent.equals("null") && symbol != null) {
+      if (change != null && !change.equals("null") && changeInPercent != null &&
+        !changeInPercent.equals("null") && symbol != null) {
         builder.withValue(QuoteColumns.SYMBOL, symbol);
-        builder.withValue(QuoteColumns.BIDPRICE, truncateBidPrice(bidPrice));
+        // Some stocks were returning null for bid price but
+        // were valid stocks, for example, AOL.
+        if (bidPrice.equals("null")) {
+          builder.withValue(QuoteColumns.BIDPRICE, "0.00");
+        } else {
+          builder.withValue(QuoteColumns.BIDPRICE, truncateBidPrice(bidPrice));
+        }
         builder.withValue(QuoteColumns.PERCENT_CHANGE, truncateChange(
           changeInPercent, true));
         builder.withValue(QuoteColumns.CHANGE, truncateChange(change, false));
@@ -108,6 +119,7 @@ public class Utils {
         }else{
           builder.withValue(QuoteColumns.ISUP, 1);
         }
+        builder.withValue(QuoteColumns.CREATED, now());
         return builder.build();
       } else {
 
@@ -137,5 +149,9 @@ public class Utils {
       e.printStackTrace();
     }
     return null;
+  }
+
+  public static long now() {
+    return System.currentTimeMillis();
   }
 }

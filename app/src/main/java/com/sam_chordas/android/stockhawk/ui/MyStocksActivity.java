@@ -19,6 +19,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.sam_chordas.android.stockhawk.R;
@@ -49,9 +50,12 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   private ItemTouchHelper mItemTouchHelper;
   private static final int CURSOR_LOADER_ID = 0;
   private QuoteCursorAdapter mCursorAdapter;
+  private TextView mEmptyView;
   private Context mContext;
   private Cursor mCursor;
   boolean isConnected;
+
+  public static String EXTRA_STOCK_SYMBOL = "stock_symbol";
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -80,12 +84,16 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
     getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
-    mCursorAdapter = new QuoteCursorAdapter(this, null);
+    mEmptyView = (TextView) findViewById(R.id.empty_view);
+
+    mCursorAdapter = new QuoteCursorAdapter(this, null, mEmptyView);
     recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(this,
             new RecyclerViewItemClickListener.OnItemClickListener() {
               @Override public void onItemClick(View v, int position) {
-                //TODO:
-                // do something on item click
+                String symbol = mCursorAdapter.getSymbolAtIndex(position);
+                Intent intent = new Intent(MyStocksActivity.this, StockDetailActivity.class);
+                intent.putExtra(EXTRA_STOCK_SYMBOL, symbol);
+                startActivity(intent);
               }
             }));
     recyclerView.setAdapter(mCursorAdapter);
@@ -217,11 +225,21 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   public void onLoadFinished(Loader<Cursor> loader, Cursor data){
     mCursorAdapter.swapCursor(data);
     mCursor = data;
+    updateEmptyView();
   }
 
   @Override
   public void onLoaderReset(Loader<Cursor> loader){
     mCursorAdapter.swapCursor(null);
+  }
+
+  private void updateEmptyView() {
+    mEmptyView.setText(getString(R.string.empty_view_default));
+    if (!isConnected) {
+      mEmptyView.setText(getString(R.string.empty_view_no_connection));
+    } else if (mCursor.getCount() == 0) {
+      mEmptyView.setText(getString(R.string.empty_view_no_stocks));
+    }
   }
 
 }

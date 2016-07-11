@@ -29,8 +29,8 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
   private static Context mContext;
   private static Typeface robotoLight;
   private boolean isPercent;
-  public QuoteCursorAdapter(Context context, Cursor cursor){
-    super(context, cursor);
+  public QuoteCursorAdapter(Context context, Cursor cursor, View emptyView){
+    super(context, cursor, emptyView);
     mContext = context;
   }
 
@@ -82,6 +82,13 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
 
   @Override public int getItemCount() {
     return super.getItemCount();
+  }
+
+  public String getSymbolAtIndex(int index) {
+    Cursor c = getCursor();
+    c.moveToPosition(index);
+    String symbol = c.getString(c.getColumnIndex(QuoteColumns.SYMBOL));
+    return symbol;
   }
 
   public static class ViewHolder extends RecyclerView.ViewHolder
