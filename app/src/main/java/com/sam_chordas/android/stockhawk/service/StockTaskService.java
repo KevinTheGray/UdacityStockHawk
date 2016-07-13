@@ -1,12 +1,13 @@
 package com.sam_chordas.android.stockhawk.service;
 
-import android.content.ContentValues;
+import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.os.RemoteException;
 import android.util.Log;
+
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
@@ -16,9 +17,11 @@ import com.sam_chordas.android.stockhawk.rest.Utils;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 /**
  * Created by sam_chordas on 9/30/15.
@@ -114,15 +117,16 @@ public class StockTaskService extends GcmTaskService{
         getResponse = fetchData(urlString);
         result = GcmNetworkManager.RESULT_SUCCESS;
         try {
-          ContentValues contentValues = new ContentValues();
-          // update ISCURRENT to 0 (false) so new data is current
-          if (isUpdate){
-            contentValues.put(QuoteColumns.ISCURRENT, 0);
-            mContext.getContentResolver().update(QuoteProvider.Quotes.CONTENT_URI, contentValues,
-                null, null);
+          // Batches the update with the other inserts so there isn't that little flash.
+          ArrayList<ContentProviderOperation> arrayList = Utils.quoteJsonToContentVals(mContext, getResponse);
+          if (!params.getTag().equals("add")) {
+            ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(
+              QuoteProvider.Quotes.CONTENT_URI);
+            builder.withValue(QuoteColumns.ISCURRENT, 0);
+            arrayList.add(0, builder.build());
           }
           mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
-              Utils.quoteJsonToContentVals(mContext, getResponse));
+            arrayList);
         }catch (RemoteException | OperationApplicationException e){
           Log.e(LOG_TAG, "Error applying batch insert", e);
         }

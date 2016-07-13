@@ -17,7 +17,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.TimeZone;
 
 /**
  * Created by sam_chordas on 10/8/15.
@@ -29,7 +31,7 @@ public class Utils {
   public static boolean showPercent = true;
   public static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
 
-  public static ArrayList quoteJsonToContentVals(Context context,  String JSON){
+  public static ArrayList<ContentProviderOperation> quoteJsonToContentVals(Context context,  String JSON){
     ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
     JSONObject jsonObject = null;
     JSONArray resultsArray = null;
@@ -153,5 +155,12 @@ public class Utils {
 
   public static long now() {
     return System.currentTimeMillis();
+  }
+
+  public static String timeStampInMillisToGMTDate(long timestamp) {
+    SimpleDateFormat sdf = new SimpleDateFormat("MMM d HH:mm:ss, yyyy z"); // the format of your date
+    sdf.setTimeZone(TimeZone.getDefault()); // give a timezone reference for formating (see comment at the bottom
+    String formattedDate = sdf.format(timestamp);
+    return formattedDate;
   }
 }
