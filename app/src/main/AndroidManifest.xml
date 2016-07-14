@@ -54,6 +54,14 @@
       android:name="com.sam_chordas.android.stockhawk.data.generated.QuoteProvider"
       android:authorities="com.sam_chordas.android.stockhawk.data.QuoteProvider"
       android:exported="false"/>
+
+    <receiver android:name=".data.QuotesWidgetProvider" >
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+      </intent-filter>
+      <meta-data android:name="android.appwidget.provider"
+                 android:resource="@xml/widget_quotes" />
+    </receiver>
   </application>
 
 </manifest>
