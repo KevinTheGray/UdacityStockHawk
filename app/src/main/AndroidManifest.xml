@@ -64,6 +64,13 @@
                  android:resource="@xml/widget_quotes" />
     </receiver>
 
+    <service
+      android:name=".data.QuotesWidgetRemoteViewsService"
+      android:enabled="@bool/widget_quotes_enabled"
+      android:exported="false"
+      android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+
     <service android:name=".service.QuotesWidgetIntentService" />
   </application>
 
