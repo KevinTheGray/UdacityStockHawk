@@ -22,4 +22,5 @@
                     android:minResizeWidth="@dimen/widget_quotes_min_resize_width"
                     android:minResizeHeight="@dimen/widget_quotes_min_resize_height"
                     android:resizeMode="vertical|horizontal"
+                    android:previewImage="@drawable/quotes_widget_preview"
                     android:updatePeriodMillis="1800000" />
