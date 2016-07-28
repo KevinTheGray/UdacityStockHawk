@@ -111,7 +111,7 @@ public class StockTaskService extends GcmTaskService{
     String getResponse;
     int result = GcmNetworkManager.RESULT_FAILURE;
 
-    if (urlStringBuilder != null){
+    if (urlStringBuilder != null) {
       urlString = urlStringBuilder.toString();
       try{
         getResponse = fetchData(urlString);
@@ -119,7 +119,7 @@ public class StockTaskService extends GcmTaskService{
         try {
           // Batches the update with the other inserts so there isn't that little flash.
           ArrayList<ContentProviderOperation> arrayList = Utils.quoteJsonToContentVals(mContext, getResponse);
-          if (!params.getTag().equals("add")) {
+          if (!params.getTag().equals("add") && arrayList.size() > 0) {
             ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(
               QuoteProvider.Quotes.CONTENT_URI);
             builder.withValue(QuoteColumns.ISCURRENT, 0);

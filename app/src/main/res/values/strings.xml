@@ -17,7 +17,7 @@
   <string name="invalid_stock_symbol" translatable="true"><xliff:g id="symbol">%1$s</xliff:g> is not a valid stock symbol!</string>
   <string name="stock_already_added" translatable="true">This stock is already saved!</string>
   <string name="graph_select_data_point_default" translatable="true">Select a data point for more information</string>
-  <string name="bid_price">Bid Price:</string>
+  <string name="bid_price" translatable="true">Bid Price</string>
 
   <!-- Empty view messages -->
   <string name="empty_view_default" translatable="true">No stock information available</string>
